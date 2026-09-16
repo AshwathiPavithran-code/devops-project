@@ -1,4 +1,4 @@
-name: Docker Build CI
+name: Docker CI/CD
 
 on:
   push:
@@ -9,8 +9,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,5 +26,17 @@ jobs:
           grep -q "Hello! My DevOps Journey" index.html
           echo "HTML test passed!"
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build Docker image
-        run: docker build -t my-devops-app .
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository }}:latest
