@@ -17,5 +17,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Run HTML test
+        run: |
+          grep -q "Hello! My DevOps Journey" index.html
+          echo "HTML test passed!"
+
       - name: Build Docker image
         run: docker build -t my-devops-app .
